@@ -1,4 +1,4 @@
-from evaluation import accuracy, balanced_accuracy, train_test_split
+from evaluation import accuracy, balanced_accuracy, f1_score, precision, recall, train_test_split
 from decision_tree import DecisionTree
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
@@ -11,7 +11,9 @@ def get_predictions_ours(X_train, y_train, X_test, y_test):
     predictions = model.predict(X_test)
     print("--- Our Model ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
-    print(f"Model's Balanced Accuracy: {balanced_accuracy(y_test, predictions)}")
+    # print(f"Model's Precision: {precision(y_test, predictions)}")
+    # print(f"Model's Recall: {recall(y_test, predictions)}")
+    # print(f"Model's F1: {f1_score(y_test, predictions)}")
 
 
 ###### SKLEARN MODEL ######
@@ -23,7 +25,9 @@ def get_predictions_sklearn(X_train, y_train, X_test, y_test):
     # Calculate evaluating metrics
     print("--- Sklearn's Model ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
-    print(f"Model's Balanced Accuracy: {balanced_accuracy(y_test, predictions)}")
+    # print(f"Model's Precision: {precision(y_test, predictions)}")
+    # print(f"Model's Recall: {recall(y_test, predictions)}")
+    # print(f"Model's F1: {f1_score(y_test, predictions)}")
 
 def scale(X):
     """
@@ -75,8 +79,7 @@ if __name__ == "__main__":
     X = df[names].values
     y = df['diagnosis'].values.reshape(-1,1)
     X = scale(X)
-
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-    # get_predictions_ours(X_train, y_train, X_test, y_test)
+    get_predictions_ours(X_train, y_train, X_test, y_test)
     get_predictions_sklearn(X_train, y_train, X_test, y_test)

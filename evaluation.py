@@ -11,8 +11,10 @@ def accuracy(y_true, y_pred):
     Returns:
     float: The accuracy of the array.
     """
-    accuracy = np.sum(y_true == y_pred) / len(y_true)
-    return accuracy
+    y_true = y_true.flatten()
+    total_samples = len(y_true)
+    correct_predictions = np.sum(y_true == y_pred)
+    return (correct_predictions / total_samples) 
 
 def balanced_accuracy(y_true, y_pred):
     """
@@ -25,15 +27,45 @@ def balanced_accuracy(y_true, y_pred):
     Returns:
     float: The balanced accuracy of the array.
     """
-    C = len(np.unique(y_true))
-    sum = 0.0
-    for i in range(C):
-        TP = np.sum((y_pred == i) & (y_true == i))
-        TN = np.sum((y_pred != i) & (y_true != i))
-        FP = np.sum((y_pred == i) & (y_true != i))
-        FN = np.sum((y_pred != i) & (y_true == i))
-        sum += (TP / (TP + FN + 1e-10) + TN / (TN + FP + 1e-10)) / (2 * C)
-    return sum
+    y_pred = np.array(y_pred)
+    y_true = y_true.flatten()
+    # Get the number of classes
+    n_classes = len(np.unique(y_true))
+
+    # Initialize an array to store the sensitivity and specificity for each class
+    sen = []
+    spec = []
+    # Loop over each class
+    for i in range(n_classes):
+        # Create a mask for the true and predicted values for class i
+        mask_true = y_true == i
+        mask_pred = y_pred == i
+
+        # Calculate the true positive, true negative, false positive, and false negative values
+        TP = np.sum(mask_true & mask_pred)
+        TN = np.sum((mask_true != True) & (mask_pred != True))
+        FP = np.sum((mask_true != True) & mask_pred)
+        FN = np.sum(mask_true & (mask_pred != True))
+
+        # Calculate the sensitivity (true positive rate) and specificity (true negative rate)
+        if TP + FN == 0:
+            sensitivity = 0
+        else:
+            sensitivity = TP / (TP + FN)
+        if TN + FP == 0:
+            specificity = 0
+        else:
+            specificity = TN / (TN + FP)
+
+        # Store the sensitivity and specificity for class i
+        sen.append(sensitivity)
+        spec.append(specificity)
+    # Calculate the balanced accuracy as the average of the sensitivity and specificity for each class
+    average_sen =  np.mean(sen)
+    average_spec =  np.mean(spec)
+    balanced_acc = (average_sen + average_spec) / n_classes
+
+    return balanced_acc
 
 def classification_error(y_true, y_pred):
     """
@@ -149,7 +181,9 @@ def precision(y_true, y_pred, average='macro'):
     """
     matrix = confusion_matrix(y_true, y_pred)
     if average == 'macro':
-        return np.mean(np.diag(matrix) / np.sum(matrix, axis=0))
+        sums = np.sum(matrix, axis=0)
+        sums[sums == 0] = 1  # avoid division by zero
+        return np.mean(np.diag(matrix) / sums)
     elif average == 'micro':
         return np.sum(np.diag(matrix)) / np.sum(matrix)
     else:

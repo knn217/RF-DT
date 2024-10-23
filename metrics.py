@@ -10,9 +10,12 @@ def gini(y):
     Returns:
     float: The Gini index of the array.
     """
-    hist = np.bincount(y)
-    ps = hist / len(y)
-    return 1 - np.sum(ps**2)
+    class_labels = np.unique(y)
+    gini = 0
+    for cls in class_labels:
+        p_cls = len(y[y == cls]) / len(y)
+        gini += p_cls**2
+    return 1 - gini
 
 def entropy(y):
     """
@@ -24,6 +27,9 @@ def entropy(y):
     Returns:
     float: The entropy of the array.
     """
-    hist = np.bincount(y)
-    ps = hist / len(y)
-    return -np.sum([p * np.log2(p) for p in ps if p > 0])
+    class_labels = np.unique(y)
+    gini = 0
+    for cls in class_labels:
+        p_cls = len(y[y == cls]) / len(y)
+        gini += -p_cls * np.log2(p_cls)
+    return 1 - gini
