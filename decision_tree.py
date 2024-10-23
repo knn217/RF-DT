@@ -8,7 +8,7 @@ import numpy as np
 from collections import Counter
 
 class DecisionTree:
-    def __init__(self, min_samples_split=2, max_depth=100, n_feats=None):
+    def __init__(self, min_samples_split=2, max_depth=100, n_feats=None, metric='gini'):
         """
         Initializes the DecisionTree with specified hyperparameters.
 
@@ -21,6 +21,7 @@ class DecisionTree:
         self.min_samples_split = min_samples_split
         self.max_depth = max_depth
         self.n_feats = n_feats
+        self.metric = metric
         self.root = None
 
     def fit(self, X, y):
@@ -88,7 +89,7 @@ class DecisionTree:
         n_samples, n_features = X.shape
 
         if n_samples >= self.min_samples_split and depth <= self.max_depth:
-            best_split = self._best_criteria(dataset, n_samples, n_features)
+            best_split = self._best_criteria(dataset, n_features)
             if best_split["gain"] != 0:
                 left = self._grow_tree(best_split["left_dataset"], depth+1)
                 right = self._grow_tree(best_split["right_dataset"], depth+1)
@@ -97,13 +98,12 @@ class DecisionTree:
         leaf_value = self._most_common_label(y)
         return Node(value=leaf_value)
 
-    def _best_criteria(self, dataset, num_samples, num_features):
+    def _best_criteria(self, dataset, num_features):
         """
         Finds the best feature and threshold to split the data.
 
         Parameters:
         dataset (ndarray): A 2D array of features and labels.
-        num_samples (int): The number of samples in the dataset.
         num_features (int): The number of features in the dataset.
 
         Returns:
@@ -124,7 +124,7 @@ class DecisionTree:
                 left_dataset, right_dataset = self._split(dataset, feat_idx, threshold)
                 if len(left_dataset) and len(right_dataset):
                     y, left_y, right_y = dataset[:, -1], left_dataset[:, -1], right_dataset[:, -1]
-                    gain = self._information_gain(y, left_y, right_y)
+                    gain = self._information_gain(y, left_y, right_y, 'gini')
                     if gain > best_split["gain"]:
                         best_split["gain"] = gain
                         best_split["feature"] = feat_idx

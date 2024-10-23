@@ -27,9 +27,10 @@ def entropy(y):
     Returns:
     float: The entropy of the array.
     """
+
     class_labels = np.unique(y)
-    gini = 0
+    entropy = 0
     for cls in class_labels:
         p_cls = len(y[y == cls]) / len(y)
-        gini += -p_cls * np.log2(p_cls)
-    return 1 - gini
+        entropy += -p_cls * np.log2(p_cls)
+    return entropy

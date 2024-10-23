@@ -6,14 +6,11 @@ import numpy as np
 
 ###### OUR MODEL ######
 def get_predictions_ours(X_train, y_train, X_test, y_test):
-    model = DecisionTree(2, 2)
+    model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     print("--- Our Model ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
-    # print(f"Model's Precision: {precision(y_test, predictions)}")
-    # print(f"Model's Recall: {recall(y_test, predictions)}")
-    # print(f"Model's F1: {f1_score(y_test, predictions)}")
 
 
 ###### SKLEARN MODEL ######
@@ -25,9 +22,6 @@ def get_predictions_sklearn(X_train, y_train, X_test, y_test):
     # Calculate evaluating metrics
     print("--- Sklearn's Model ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
-    # print(f"Model's Precision: {precision(y_test, predictions)}")
-    # print(f"Model's Recall: {recall(y_test, predictions)}")
-    # print(f"Model's F1: {f1_score(y_test, predictions)}")
 
 def scale(X):
     """
