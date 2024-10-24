@@ -1,26 +1,44 @@
 from evaluation import accuracy, balanced_accuracy, f1_score, precision, recall, train_test_split
 from decision_tree import DecisionTree
+from random_forest import RandomForest
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 import numpy as np
 
 ###### OUR MODEL ######
-def get_predictions_ours(X_train, y_train, X_test, y_test):
+def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
     model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
-    print("--- Our Model ---")
+    print("--- Our Model (DT) ---")
+    print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+
+def get_predictions_rf_ours(X_train, y_train, X_test, y_test):
+    model = RandomForest(min_samples_split=2, max_depth=2, n_trees=10)
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    print("--- Our Model (RF) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
 
 
 ###### SKLEARN MODEL ######
-def get_predictions_sklearn(X_train, y_train, X_test, y_test):
+def get_predictions_dt_sklearn(X_train, y_train, X_test, y_test):
     decision_tree_classifier = DecisionTreeClassifier()
     decision_tree_classifier.fit(X_train, y_train)
     predictions = decision_tree_classifier.predict(X_test)
 
     # Calculate evaluating metrics
-    print("--- Sklearn's Model ---")
+    print("--- Sklearn's Model (DT) ---")
+    print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+
+def get_predictions_rf_sklearn(X_train, y_train, X_test, y_test):
+    random_forest_classifier = RandomForestClassifier(min_samples_split=2, max_depth=2, n_estimators=10)
+    random_forest_classifier.fit(X_train, y_train.ravel())
+    predictions = random_forest_classifier.predict(X_test)
+
+    # Calculate evaluating metrics
+    print("--- Sklearn's Model (RF) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
 
 def scale(X):
@@ -75,5 +93,8 @@ if __name__ == "__main__":
     X = scale(X)
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-    get_predictions_ours(X_train, y_train, X_test, y_test)
-    get_predictions_sklearn(X_train, y_train, X_test, y_test)
+    get_predictions_dt_ours(X_train, y_train, X_test, y_test)
+    get_predictions_dt_sklearn(X_train, y_train, X_test, y_test)
+
+    get_predictions_rf_ours(X_train, y_train, X_test, y_test)
+    get_predictions_rf_sklearn(X_train, y_train, X_test, y_test)
