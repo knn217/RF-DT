@@ -34,8 +34,8 @@ class DecisionTree:
         Returns:
         DecisionTree: The trained model.
         """
-        self.dataset = np.concatenate((X, y), axis=1)
-        self.root = self._grow_tree(self.dataset)
+        dataset = np.concatenate((X, y), axis=1)
+        self.root = self._grow_tree(dataset)
 
     def predict(self, X):
         """
