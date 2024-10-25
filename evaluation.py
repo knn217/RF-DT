@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def accuracy(y_true, y_pred):
     """
@@ -271,3 +272,23 @@ def train_test_split(X, y, random_state=40, test_size=0.2):
     X_train, X_test = X[idx_train], X[idx_test]
     y_train, y_test = y[idx_train], y[idx_test]
     return X_train, X_test, y_train, y_test
+
+def one_hot_encode(df: pd.DataFrame):
+    """
+    Performs custom one-hot encoding on categorical columns of a DataFrame.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame with columns to be encoded.
+
+    Returns:
+    pd.DataFrame: A new DataFrame with categorical columns one-hot encoded.
+                    Numeric columns are included as-is.
+    """
+    one_hot_encoded = pd.DataFrame()
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            dummies = pd.get_dummies(df[col], prefix=col)
+            one_hot_encoded = pd.concat([one_hot_encoded, dummies], axis=1)
+        else:
+            one_hot_encoded = pd.concat([one_hot_encoded, df[col]], axis=1)
+    return one_hot_encoded

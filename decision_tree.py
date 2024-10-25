@@ -20,7 +20,6 @@ class DecisionTree:
         """
         self.min_samples_split = min_samples_split
         self.max_depth = max_depth
-        self.n_feats = n_feats
         self.metric = metric
         self.root = None
 
@@ -35,9 +34,8 @@ class DecisionTree:
         Returns:
         DecisionTree: The trained model.
         """
-        self.n_feats = X.shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])
-        dataset = np.concatenate((X, y), axis=1)
-        self.root = self._grow_tree(dataset)
+        self.dataset = np.concatenate((X, y), axis=1)
+        self.root = self._grow_tree(self.dataset)
 
     def predict(self, X):
         """
@@ -67,6 +65,28 @@ class DecisionTree:
 
         left_idxs = np.where(dataset[:, feature] <= threshold)[0]
         right_idxs = np.where(dataset[:, feature] > threshold)[0]
+
+        left_dataset = dataset[left_idxs]
+        right_dataset = dataset[right_idxs]
+
+        return left_dataset, right_dataset
+    
+    
+    def _split_categorical(self, dataset, feature, threshold):
+        """
+        Splits the data based on the given threshold for categorical variables.
+
+        Parameters:
+        dataset (ndarray): A 2D array of features and labels.
+        feature (int): Index of the feature to be split on.
+        threshold (set): A set of values to split the data.
+
+        Returns:
+        left_dataset (ndarray): A 2D array of features and labels for the left dataset.
+        right_dataset (ndarray): A 2D array of features and labels for the right dataset.
+        """
+        left_idxs = np.where(np.isin(dataset[:, feature], threshold))[0]
+        right_idxs = np.where(~np.isin(dataset[:, feature], threshold))[0]
 
         left_dataset = dataset[left_idxs]
         right_dataset = dataset[right_idxs]
@@ -120,8 +140,9 @@ class DecisionTree:
         for feat_idx in range(num_features):
             X_column = dataset[:, feat_idx]
             thresholds = np.unique(X_column)
+            split_func = self._split if type(X_column[0]) is float else self._split_categorical
             for threshold in thresholds:
-                left_dataset, right_dataset = self._split(dataset, feat_idx, threshold)
+                left_dataset, right_dataset = split_func(dataset, feat_idx, threshold)
                 if len(left_dataset) and len(right_dataset):
                     y, left_y, right_y = dataset[:, -1], left_dataset[:, -1], right_dataset[:, -1]
                     gain = self._information_gain(y, left_y, right_y, 'gini')
@@ -132,7 +153,7 @@ class DecisionTree:
                         best_split["left_dataset"] = left_dataset
                         best_split["right_dataset"] = right_dataset
         return best_split
-
+    
     def _information_gain(self, parent, left, right, criterion='entropy'):        
         """
         Calculates the information gain of a split using the specified criterion.
@@ -191,3 +212,24 @@ class DecisionTree:
         """
         Y = list(Y)
         return max(Y, key=Y.count)
+    
+    def print_tree(self, columns=None, node=None, depth=0):
+        """
+        Prints the decision tree in a readable format.
+
+        Parameters:
+        node (Node): The current node of the decision tree.
+        depth (int): The current depth of the tree. Default is 0.
+        """
+        if not node:
+            node = self.root
+
+        if node.is_leaf_node():
+            print(f"{depth * '  '}Predict: {node.value}")
+            return
+        feature_name = node.feature if columns is None else columns[node.feature]
+        feature_equality = "==" if type(node.threshold) is bool else "<="
+        print(f"{depth * '  '}{feature_name} {feature_equality} {node.threshold}")
+
+        self.print_tree(columns, node.left, depth + 1)
+        self.print_tree(columns, node.right, depth + 1)

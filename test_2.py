@@ -1,4 +1,4 @@
-from evaluation import accuracy, balanced_accuracy, f1_score, precision, recall, train_test_split
+from evaluation import accuracy, balanced_accuracy, one_hot_encode, f1_score, precision, recall, train_test_split
 from decision_tree import DecisionTree
 from random_forest import RandomForest
 from sklearn.tree import DecisionTreeClassifier
@@ -10,6 +10,7 @@ import numpy as np
 def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
     model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
     model.fit(X_train, y_train)
+    model.print_tree(columns = columns)
     predictions = model.predict(X_test)
     print("--- Our Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
@@ -61,36 +62,15 @@ def scale(X):
     return X
 
 if __name__ == "__main__":
-    df = pd.read_csv("breast-cancer.csv")
-    names = ['radius_mean',
-    'texture_mean',
-    'perimeter_mean',
-    'area_mean',
-    'smoothness_mean',
-    'compactness_mean',
-    'concavity_mean',
-    'concave points_mean',
-    'symmetry_mean',
-    'radius_se',
-    'perimeter_se',
-    'area_se',
-    'compactness_se',
-    'concavity_se',
-    'concave points_se',
-    'radius_worst',
-    'texture_worst',
-    'perimeter_worst',
-    'area_worst',
-    'smoothness_worst',
-    'compactness_worst',
-    'concavity_worst',
-    'concave points_worst',
-    'symmetry_worst',
-    'fractal_dimension_worst']
+    df = pd.read_csv("drug200.csv")
+    df_X = df.drop('Drug', axis=1)
+    df_encoded = one_hot_encode(df_X)
 
-    X = df[names].values
-    y = df['diagnosis'].values.reshape(-1,1)
-    X = scale(X)
+    X = df_encoded.values
+    y = df['Drug'].values.reshape(-1,1)
+
+    columns = df_encoded.columns.values
+
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
     get_predictions_dt_ours(X_train, y_train, X_test, y_test)
