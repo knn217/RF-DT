@@ -66,7 +66,7 @@ def scale(X):
     return X
 
 if __name__ == "__main__":
-    available_sizes = [1e3, 1e4, 1e5, 5e3, 5e4, 5e5]
+    available_sizes = [1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 8e3, 9e3, 1e4]
     datasets = [f"fake_drug_data_{int(size)}.csv" for size in available_sizes]  # Add your dataset filenames here
     log_file = f"./benchmark/benchmark_drug_{datetime.now()}.txt"
 

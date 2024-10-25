@@ -62,5 +62,5 @@ def gen_dataset_2(n_rows):
     
     df.to_csv(f"fake_drug_data_{n_rows}.csv", index=False)
 # Example usage:
-size = [1e3, 1e4, 1e5, 5e3, 5e4, 5e5]
-[gen_dataset_2(int(n)) for n in size]
+size = [1e3, 2e3, 3e3, 4e3, 5e3, 6e3, 7e3, 8e3, 9e3, 1e4]
+[gen_dataset_1(int(n)) for n in size]
