@@ -2,3 +2,4 @@ __pycache__
 venv
 benchmark/*.txt
 fake_*.csv
+log/*.txt

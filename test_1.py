@@ -3,12 +3,31 @@ from decision_tree import DecisionTree
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 import numpy as np
+import os
+import cProfile
+
+
+def getDir(file_name):
+    full_path = os.path.realpath(__file__)
+    path, filename = os.path.split(full_path)
+    dir = os.path.join(path, file_name)
+    #print(dir)
+    return dir
+
+def saveToTxt(data, name):
+    dir = getDir(name)
+    with open(dir, 'w', encoding='utf8') as f:
+        for line in data:
+            #print(line)
+            f.write(str(line))
+    return
 
 ###### OUR MODEL ######
-def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
+def get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns):
     model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
     model.fit(X_train, y_train)
     model.print_tree(columns = columns)
+    saveToTxt(model.log_tree(columns = columns), "log/breast_cancer.txt")
     predictions = model.predict(X_test)
     print("--- Our Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
@@ -59,8 +78,8 @@ def scale(X):
 
     return X
 
-if __name__ == "__main__":
-    df = pd.read_csv("./breast-cancer.csv")
+def all():
+    df = pd.read_csv(getDir("breast-cancer.csv"))
     names = ['radius_mean',
     'texture_mean',
     'perimeter_mean',
@@ -93,5 +112,12 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-    get_predictions_dt_ours(X_train, y_train, X_test, y_test)
+    get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns)
     get_predictions_dt_sklearn(X_train, y_train, X_test, y_test)
+
+    get_predictions_rf_ours(X_train, y_train, X_test, y_test)
+    get_predictions_rf_sklearn(X_train, y_train, X_test, y_test)
+    return
+
+if __name__ == "__main__":
+    cProfile.run('all()')

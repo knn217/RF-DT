@@ -3,12 +3,15 @@ from decision_tree import DecisionTree
 from sklearn.tree import DecisionTreeClassifier, export_text
 import pandas as pd
 import numpy as np
+from test_1 import getDir, saveToTxt
+import cProfile
 
 ###### OUR MODEL ######
-def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
-    model = DecisionTree(min_samples_split=5, max_depth=10, metric='gini')
+def get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns):
+    model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
     model.fit(X_train, y_train)
     model.print_tree(columns = columns)
+    saveToTxt(model.log_tree(columns = columns), "log/drug.txt")
     predictions = model.predict(X_test)
     print("--- Our Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
@@ -61,8 +64,8 @@ def scale(X):
 
     return X
 
-if __name__ == "__main__":
-    df = pd.read_csv("./drug200.csv")
+def all():
+    df = pd.read_csv(getDir("drug200.csv"))
     df_X = df.drop('Drug', axis=1)
     df_encoded = one_hot_encode(df_X)
 
@@ -73,5 +76,12 @@ if __name__ == "__main__":
 
     X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-    get_predictions_dt_ours(X_train, y_train, X_test, y_test)
+    get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns)
     get_predictions_dt_sklearn(X_train, y_train, X_test, y_test)
+
+    get_predictions_rf_ours(X_train, y_train, X_test, y_test)
+    get_predictions_rf_sklearn(X_train, y_train, X_test, y_test)
+    return
+
+if __name__ == "__main__":
+    cProfile.run('all()')

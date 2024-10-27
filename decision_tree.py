@@ -233,3 +233,26 @@ class DecisionTree:
 
         self.print_tree(columns, node.left, depth + 1)
         self.print_tree(columns, node.right, depth + 1)
+        
+    def log_tree(self, columns=None, node=None, depth=0):
+        """
+        Prints the decision tree in a readable format.
+
+        Parameters:
+        node (Node): The current node of the decision tree.
+        depth (int): The current depth of the tree. Default is 0.
+        """
+        if not node:
+            node = self.root
+
+        log = ""
+        if node.is_leaf_node():
+            log += f"{depth * '  '}Predict: {node.value}\n"
+            return log
+        feature_name = node.feature if columns is None else columns[node.feature]
+        feature_equality = "==" if type(node.threshold) is bool else "<="
+        log += f"{depth * '  '}{feature_name} {feature_equality} {node.threshold}\n"
+
+        log += self.log_tree(columns, node.left, depth + 1)
+        log += self.log_tree(columns, node.right, depth + 1)
+        return log
