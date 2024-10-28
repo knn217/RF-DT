@@ -114,9 +114,6 @@ def all():
 
     get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns)
     get_predictions_dt_sklearn(X_train, y_train, X_test, y_test)
-
-    get_predictions_rf_ours(X_train, y_train, X_test, y_test)
-    get_predictions_rf_sklearn(X_train, y_train, X_test, y_test)
     return
 
 if __name__ == "__main__":
