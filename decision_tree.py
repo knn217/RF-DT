@@ -1,6 +1,6 @@
 # This contains code from Fares Elmenshawii.
 # Link: https://www.kaggle.com/code/fareselmenshawii/decision-tree-from-scratch/notebook
-# It has been modified by Sang Kha for research and educating purpose.
+# The code has been modified and extended by Sang Kha for research and educating purposes.
 
 from metrics import entropy, gini
 from node import Node

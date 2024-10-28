@@ -32,5 +32,6 @@ def entropy(y):
     entropy = 0
     for cls in class_labels:
         p_cls = len(y[y == cls]) / len(y)
-        entropy += -p_cls * np.log2(p_cls)
+        p_cls_norm = p_cls + 1e-15 # to avoid log2 of zero
+        entropy += -p_cls_norm * np.log2(p_cls_norm)
     return entropy
