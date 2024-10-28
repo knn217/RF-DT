@@ -17,239 +17,70 @@ def accuracy(y_true, y_pred):
     correct_predictions = np.sum(y_true == y_pred)
     return (correct_predictions / total_samples) 
 
-def balanced_accuracy(y_true, y_pred):
+def confusion_score(y_true, y_pred, mode="macro"):
     """
-    Calculates the balanced accuracy of a given array, for multi-class classification problems.
+    Calculates the F1 score for multi-label classification in either macro or micro mode.
 
     Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
+    y_true (np.ndarray): A 1D array of true labels.
+    y_pred (np.ndarray): A 1D array of predicted labels.
+    mode (str): Either 'macro' or 'micro'. Determines the F1 score calculation mode.
 
     Returns:
-    float: The balanced accuracy of the array.
+    float: The F1 score.
     """
-    y_pred = np.array(y_pred)
-    y_true = y_true.flatten()
-    # Get the number of classes
-    n_classes = len(np.unique(y_true))
 
-    # Initialize an array to store the sensitivity and specificity for each class
-    sen = []
-    spec = []
-    # Loop over each class
-    for i in range(n_classes):
-        # Create a mask for the true and predicted values for class i
-        mask_true = y_true == i
-        mask_pred = y_pred == i
-
-        # Calculate the true positive, true negative, false positive, and false negative values
-        TP = np.sum(mask_true & mask_pred)
-        TN = np.sum((mask_true != True) & (mask_pred != True))
-        FP = np.sum((mask_true != True) & mask_pred)
-        FN = np.sum(mask_true & (mask_pred != True))
-
-        # Calculate the sensitivity (true positive rate) and specificity (true negative rate)
-        if TP + FN == 0:
-            sensitivity = 0
-        else:
-            sensitivity = TP / (TP + FN)
-        if TN + FP == 0:
-            specificity = 0
-        else:
-            specificity = TN / (TN + FP)
-
-        # Store the sensitivity and specificity for class i
-        sen.append(sensitivity)
-        spec.append(specificity)
-    # Calculate the balanced accuracy as the average of the sensitivity and specificity for each class
-    average_sen =  np.mean(sen)
-    average_spec =  np.mean(spec)
-    balanced_acc = (average_sen + average_spec) / n_classes
-
-    return balanced_acc
-
-def classification_error(y_true, y_pred):
-    """
-    Calculates the classification error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The classification error of the array.
-    """
-    return 1 - accuracy(y_true, y_pred)
-
-def mean_squared_error(y_true, y_pred):
-    """
-    Calculates the mean squared error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The mean squared error of the array.
-    """
-    return np.mean((y_true - y_pred)**2)
-
-def mean_absolute_error(y_true, y_pred):
-    """
-    Calculates the mean absolute error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The mean absolute error of the array.
-    """
-    return np.mean(np.abs(y_true - y_pred))
-
-def r2_score(y_true, y_pred):
-    """
-    Calculates the R^2 score of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The R^2 score of the array.
-    """
-    mean = np.mean(y_true)
-    ss_tot = np.sum((y_true - mean) ** 2)
-    ss_res = np.sum((y_true - y_pred) ** 2)
-    return 1 - (ss_res / ss_tot)
-
-def mean_squared_log_error(y_true, y_pred):
-    """
-    Calculates the mean squared log error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The mean squared log error of the array.
-    """
-    return np.mean((np.log(y_true + 1) - np.log(y_pred + 1)) ** 2)
-
-def mean_absolute_percentage_error(y_true, y_pred):
-    """
-    Calculates the mean absolute percentage error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The mean absolute percentage error of the array.
-    """
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-
-def confusion_matrix(y_true, y_pred):
-    """
-    Calculates the confusion matrix of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    ndarray: The confusion matrix of the array.
-    """
-    unique_labels = np.unique(y_true)
-    matrix = np.zeros((len(unique_labels), len(unique_labels)), dtype=int)
-    for i, true_label in enumerate(unique_labels):
-        for j, pred_label in enumerate(unique_labels):
-            matrix[i, j] = np.sum((y_true == true_label) & (y_pred == pred_label))
-    return matrix
-
-def precision(y_true, y_pred, average='macro'):
-    """
-    Calculates the precision of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-    average (str): The averaging method to use. Default is 'macro'.
-
-    Returns:
-    float: The precision of the array.
-    """
-    matrix = confusion_matrix(y_true, y_pred)
-    if average == 'macro':
-        sums = np.sum(matrix, axis=0)
-        sums[sums == 0] = 1  # avoid division by zero
-        return np.mean(np.diag(matrix) / sums)
-    elif average == 'micro':
-        return np.sum(np.diag(matrix)) / np.sum(matrix)
-    else:
-        raise ValueError("Invalid averaging method. Use 'macro' or 'micro'")
+    def one_hot_encode(arr: np.ndarray):
+        # Get unique classes and their indices
+        unique_classes, indices = np.unique(arr, return_inverse=True)
+        
+        # Create one-hot encoded matrix
+        one_hot = np.zeros((arr.size, unique_classes.size))
+        one_hot[np.arange(arr.size), indices] = 1
+        
+        return one_hot
     
-def recall(y_true, y_pred, average='macro'):
-    """
-    Calculates the recall of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-    average (str): The averaging method to use. Default is 'macro'.
-
-    Returns:
-    float: The recall of the array.
-    """
-    matrix = confusion_matrix(y_true, y_pred)
-    if average == 'macro':
-        return np.mean(np.diag(matrix) / np.sum(matrix, axis=1))
-    elif average == 'micro':
-        return np.sum(np.diag(matrix)) / np.sum(matrix)
-    else:
-        raise ValueError("Invalid averaging method. Use 'macro' or 'micro'")
+    # One-hot encode the true and predicted labels
+    y_true_one_hot = one_hot_encode(y_true)
+    y_pred_one_hot = one_hot_encode(y_pred)
     
-def f1_score(y_true, y_pred, average='macro'):
-    """
-    Calculates the F1 score of a given array.
+    # Adjust shapes if y_pred_one_hot has fewer columns
+    if y_true_one_hot.shape[1] != y_pred_one_hot.shape[1]:
+        y_pred_one_hot = np.pad(
+            y_pred_one_hot,
+            ((0, 0), (0, y_true_one_hot.shape[1] - y_pred_one_hot.shape[1])),
+            mode="constant",
+        )
+    
+    # True positives, predicted positives, actual positives per label
+    true_positives = np.sum((y_true_one_hot == 1) & (y_pred_one_hot == 1), axis=0)
+    predicted_positives = np.sum(y_pred_one_hot == 1, axis=0)
+    actual_positives = np.sum(y_true_one_hot == 1, axis=0)
+    
+    # Calculate precision, recall, and F1 scores for each label
+    precision_per_label = true_positives / (predicted_positives + 1e-9)
+    recall_per_label = true_positives / (actual_positives + 1e-9)
+    f1_per_label = 2 * (precision_per_label * recall_per_label) / (precision_per_label + recall_per_label + 1e-9)
 
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-    average (str): The averaging method to use. Default is 'macro'.
+    if mode == "macro":
+        # Macro F1: Average F1 scores across labels
+        f1_score = np.mean(f1_per_label)
+        precision = np.mean(precision_per_label)
+        recall = np.mean(recall_per_label)
+        return precision, recall, f1_score
+    elif mode == "micro":
+        # Micro F1: Calculate global precision and recall and then F1
+        total_true_positives = np.sum(true_positives)
+        total_predicted_positives = np.sum(predicted_positives)
+        total_actual_positives = np.sum(actual_positives)
 
-    Returns:
-    float: The F1 score of the array.
-    """
-    return 2 * (precision(y_true, y_pred, average) * recall(y_true, y_pred, average)) / (precision(y_true, y_pred, average) + recall(y_true, y_pred, average))
+        micro_precision = total_true_positives / (total_predicted_positives + 1e-9)
+        micro_recall = total_true_positives / (total_actual_positives + 1e-9)
+        f1_score = 2 * (micro_precision * micro_recall) / (micro_precision + micro_recall + 1e-9)
+        return micro_precision, micro_recall, f1_score
+    else:
+        raise ValueError("Mode should be 'macro' or 'micro'")
 
-def accuracy_score(y_true, y_pred):
-    """
-    Calculates the accuracy score of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The accuracy score of the array.
-    """
-    return np.sum(y_true == y_pred) / len(y_true)
-
-def mean_absolute_percentage_error(y_true, y_pred):
-    """
-    Calculates the mean absolute percentage error of a given array.
-
-    Parameters:
-    y_true (ndarray): A 1D array of true labels.
-    y_pred (ndarray): A 1D array of predicted labels.
-
-    Returns:
-    float: The mean absolute percentage error of the array.
-    """
-    y_true, y_pred = np.array(y_true), np.array(y_pred)
-    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 def train_test_split(X, y, random_state=40, test_size=0.2):
     """

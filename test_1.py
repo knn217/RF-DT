@@ -1,4 +1,4 @@
-from evaluation import accuracy, balanced_accuracy, f1_score, precision, recall, train_test_split
+from evaluation import accuracy, confusion_score, train_test_split
 from decision_tree import DecisionTree
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
@@ -12,6 +12,14 @@ def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
     predictions = model.predict(X_test)
     print("--- Our Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "macro")
+    print(f"Model's F1 (Macro): {f1_score}")
+    print(f"Model's Precision (Macro): {precision}")
+    print(f"Model's Recall (Macro): {recall}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "micro")
+    print(f"Model's F1 (Micro): {f1_score}")
+    print(f"Model's Precision (Micro): {precision}")
+    print(f"Model's Recall (Micro): {recall}")
 
 
 ###### SKLEARN MODEL ######
@@ -23,6 +31,14 @@ def get_predictions_dt_sklearn(X_train, y_train, X_test, y_test):
     # Calculate evaluating metrics
     print("--- Sklearn's Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "macro")
+    print(f"Model's F1 (Macro): {f1_score}")
+    print(f"Model's Precision (Macro): {precision}")
+    print(f"Model's Recall (Macro): {recall}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "micro")
+    print(f"Model's F1 (Micro): {f1_score}")
+    print(f"Model's Precision (Micro): {precision}")
+    print(f"Model's Recall (Micro): {recall}")
 
 def scale(X):
     """

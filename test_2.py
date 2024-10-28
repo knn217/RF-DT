@@ -1,17 +1,25 @@
-from evaluation import accuracy, balanced_accuracy, one_hot_encode, f1_score, precision, recall, train_test_split
+from evaluation import accuracy, one_hot_encode, confusion_score, train_test_split
 from decision_tree import DecisionTree
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, export_text
 import pandas as pd
 import numpy as np
 
 ###### OUR MODEL ######
 def get_predictions_dt_ours(X_train, y_train, X_test, y_test):
-    model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
+    model = DecisionTree(min_samples_split=5, max_depth=10, metric='gini')
     model.fit(X_train, y_train)
     model.print_tree(columns = columns)
     predictions = model.predict(X_test)
     print("--- Our Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "macro")
+    print(f"Model's F1 (Macro): {f1_score}")
+    print(f"Model's Precision (Macro): {precision}")
+    print(f"Model's Recall (Macro): {recall}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "micro")
+    print(f"Model's F1 (Micro): {f1_score}")
+    print(f"Model's Precision (Micro): {precision}")
+    print(f"Model's Recall (Micro): {recall}")
 
 
 ###### SKLEARN MODEL ######
@@ -20,9 +28,19 @@ def get_predictions_dt_sklearn(X_train, y_train, X_test, y_test):
     decision_tree_classifier.fit(X_train, y_train)
     predictions = decision_tree_classifier.predict(X_test)
 
+    print(export_text(decision_tree_classifier))
+
     # Calculate evaluating metrics
     print("--- Sklearn's Model (DT) ---")
     print(f"Model's Accuracy: {accuracy(y_test, predictions)}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "macro")
+    print(f"Model's F1 (Macro): {f1_score}")
+    print(f"Model's Precision (Macro): {precision}")
+    print(f"Model's Recall (Macro): {recall}")
+    precision, recall, f1_score = confusion_score(y_test, predictions, "micro")
+    print(f"Model's F1 (Micro): {f1_score}")
+    print(f"Model's Precision (Micro): {precision}")
+    print(f"Model's Recall (Micro): {recall}")
 
 def scale(X):
     """
