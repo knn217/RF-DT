@@ -8,7 +8,7 @@ import cProfile
 
 ###### OUR MODEL ######
 def get_predictions_dt_ours(X_train, y_train, X_test, y_test, columns):
-    model = DecisionTree(min_samples_split=2, max_depth=2, metric='gini')
+    model = DecisionTree(min_samples_split=2, max_depth=4, metric='gini')
     model.fit(X_train, y_train)
     model.print_tree(columns = columns)
     saveToTxt(model.log_tree(columns = columns), "log/drug.txt")
@@ -81,4 +81,5 @@ def all():
     return
 
 if __name__ == "__main__":
-    cProfile.run('all()')
+    all()
+    #cProfile.run('all()')
